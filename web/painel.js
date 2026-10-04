@@ -106,7 +106,7 @@ function render(animate = false) {
   $('instante-hora').value = formatTime(point?.observedAt);
   $('pausar').textContent = playing ? 'PAUSAR' : testing ? index === testPoints.length - 1 ? 'REINICIAR' : 'CONTINUAR' : 'AO VIVO';
   $('play-status').textContent = testing ? playing ? 'TESTE · ATUALIZAÇÃO A CADA 0,5 S' : 'TESTE PAUSADO' : !playing ? 'HISTÓRICO · VOLTAR AO VIVO' : state.error || stale ? 'COLETA EM ESPERA' : 'ATUALIZAÇÃO · CERCA DE 1 MIN';
-  $('fonte-status').textContent = testing ? 'Simulação acelerada com candidaturas fictícias. Retas conectam os registros de teste.' : state.error ? `${state.current ? 'Último resultado preservado.' : 'Ainda sem resultado.'} ${state.error} Próxima tentativa: ${formatTime(state.nextCheck)}.` : state.current ? `TSE · consulta arquivada ${checkClock.format(state.checkedAt)} · arquivo gerado ${new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'medium' }).format(state.current.generatedAt)}. ${stale ? 'A publicação está atrasada; último resultado preservado.' : 'Votos só mudam quando o TSE publica. Painel independente, sem vínculo com o TSE.'}` : 'Consultando a fonte oficial. Painel independente, sem vínculo com o TSE.';
+  $('fonte-status').textContent = 'Última atualização: ' + (state.checkedAt ? checkClock.format(state.checkedAt) : '—');
   updateTable(candidates); drawChart(animate);
 }
 
