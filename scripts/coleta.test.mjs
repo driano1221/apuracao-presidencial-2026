@@ -55,7 +55,7 @@ test('arquivo público recupera o histórico completo e respeita o bloqueio apó
   } finally { db.close(); next.close(); await rm(folder, { recursive: true }); }
 });
 
-test('coleta em D1: concorrência, 304, correção, geração antiga e bloqueio', async () => {
+test('coleta em SQLite: concorrência, 304, correção, geração antiga e bloqueio', async () => {
   const db = openStore();
   const realFetch = globalThis.fetch;
   let response = copy(), calls = 0, status = 200;

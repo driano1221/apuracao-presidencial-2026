@@ -133,7 +133,7 @@ async function poll() {
     const fresh = await r.json();
     if (!Number.isSafeInteger(fresh.historyVersion) || fresh.historyVersion < 0) throw Error('Resposta do painel inválida.');
     if (fresh.current && (!Array.isArray(fresh.current.candidates) || !Number.isSafeInteger(fresh.current.observedAt))) throw Error('Resultado do painel inválido.');
-    if (state.checkedAt && fresh.checkedAt < state.checkedAt) return;
+    if (state.checkedAt && fresh.checkedAt < state.checkedAt) { if (!testing) render(); return; }
     if (historyVersion !== fresh.historyVersion) {
       const hr = await fetch(root + 'history.json?registro=' + fresh.historyVersion, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
       if (!hr.ok) throw Error('Histórico temporariamente indisponível.');
