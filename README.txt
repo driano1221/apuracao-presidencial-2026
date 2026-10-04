@@ -1,6 +1,6 @@
 PAINEL PRESIDENCIAL 2026 — PUBLICAÇÃO GRATUITA
 
-Endereço previsto (confirme a publicação no GitHub Pages):
+Endereço público:
 https://driano1221.github.io/apuracao-presidencial-2026/
 
 Painel independente, sem vínculo institucional com o TSE.
@@ -16,11 +16,17 @@ votos vêm do EA20. Nenhuma candidatura fictícia entra nos arquivos oficiais.
 
 Novas gerações são publicadas assim que observadas, com intervalo mínimo de
 10 segundos entre publicações. Sem mudanças, o registro de última consulta
-é publicado uma vez por minuto. O navegador verifica o arquivo público a
-cada 2 segundos e baixa o histórico apenas quando há nova geração.
-Isso não garante votos novos a cada 2 segundos: há o ritmo e o cache do TSE,
-o envio do arquivo e o cache do GitHub. A interface informa quando o arquivo
-está atrasado. Nenhum serviço usa os runners como servidor HTTP.
+é publicado uma vez por minuto. O navegador consulta a versão publicada a
+cada 65 segundos e baixa o histórico apenas quando há nova geração.
+O endereço do commit evita o cache atrasado da branch: a API anônima do
+GitHub limita consultas a 60 por hora/IP, portanto não é adequado consultá-la
+a cada 2 segundos. Se a API falhar ou limitar acesso, a branch pública é
+usada como alternativa, com possível atraso de cache. A interface preserva
+o último resultado e informa quando o arquivo está atrasado.
+A coleta central continua a cada aproximadamente 2 segundos, mas a
+atualização visível desta versão gratuita ocorre em torno de um minuto,
+somado à publicação e ao cache do próprio TSE. Nenhum serviço usa os runners
+como servidor HTTP. O modo TESTE atualiza a cada 0,5 segundo.
 
 A coleta independe do computador e de páginas abertas. Usa quatro etapas
 de até 5 horas, sequenciais, recuperando os registros da branch dados em cada

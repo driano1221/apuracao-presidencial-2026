@@ -7,7 +7,11 @@ const checkClock = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Pau
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const formatTime = ms => Number.isFinite(ms) ? clock.format(ms) : '—';
 const escapeHTML = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const dataRoot = ['127.0.0.1', 'localhost'].includes(location.hostname) ? './data/' : 'https://raw.githubusercontent.com/driano1221/apuracao-presidencial-2026/dados/';
+const localPreview = ['127.0.0.1', 'localhost'].includes(location.hostname);
+const repository = 'driano1221/apuracao-presidencial-2026';
+const dataRoot = localPreview ? './data/' : 'https://raw.githubusercontent.com/' + repository + '/dados/';
+const refreshMs = localPreview ? 2000 : 65000;
+let nextApiCheck = 0;
 const demos = [{ id: 'a', name: 'CANDIDATURA A', order: 1 }, { id: 'b', name: 'CANDIDATURA B', order: 2 }, { id: 'c', name: 'CANDIDATURA C', order: 3 }];
 const testPoints = Array.from({ length: 181 }, (_, i) => {
   const p = i / 180, total = Math.round(100000000 * (p - Math.sin(p * Math.PI * 2) * .08));
@@ -99,7 +103,7 @@ function render(animate = false) {
   $('instante').setAttribute('aria-label', testing ? 'Horário da simulação' : 'Horário do registro da apuração');
   $('instante-hora').value = formatTime(point?.observedAt);
   $('pausar').textContent = playing ? 'PAUSAR' : testing ? index === testPoints.length - 1 ? 'REINICIAR' : 'CONTINUAR' : 'AO VIVO';
-  $('play-status').textContent = testing ? playing ? 'TESTE · ATUALIZAÇÃO A CADA 0,5 S' : 'TESTE PAUSADO' : !playing ? 'HISTÓRICO · VOLTAR AO VIVO' : state.error || stale ? 'COLETA EM ESPERA' : 'ATUALIZAÇÃO A CADA 2 S';
+  $('play-status').textContent = testing ? playing ? 'TESTE · ATUALIZAÇÃO A CADA 0,5 S' : 'TESTE PAUSADO' : !playing ? 'HISTÓRICO · VOLTAR AO VIVO' : state.error || stale ? 'COLETA EM ESPERA' : 'ATUALIZAÇÃO · CERCA DE 1 MIN';
   $('fonte-status').textContent = testing ? 'Simulação acelerada com candidaturas fictícias. Retas conectam os registros de teste.' : state.error ? `${state.current ? 'Último resultado preservado.' : 'Ainda sem resultado.'} ${state.error} Próxima tentativa: ${formatTime(state.nextCheck)}.` : state.current ? `TSE · consulta arquivada ${checkClock.format(state.checkedAt)} · arquivo gerado ${new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'medium' }).format(state.current.generatedAt)}. ${stale ? 'A publicação está atrasada; último resultado preservado.' : 'Votos só mudam quando o TSE publica. Painel independente, sem vínculo com o TSE.'}` : 'Consultando a fonte oficial. O botão TESTE abre uma simulação com votos fictícios.';
   updateTable(candidates); drawChart(animate);
 }
@@ -107,16 +111,31 @@ function render(animate = false) {
 async function poll() {
   clearTimeout(pollTimer);
   if (busy) return;
-  if (document.hidden) { pollTimer = setTimeout(poll, 2000); return; }
+  if (document.hidden) { pollTimer = setTimeout(poll, refreshMs); return; }
   busy = true;
   try {
-    const r = await fetch(dataRoot + 'latest.json?consulta=' + Math.floor(Date.now() / 2000), { cache: 'no-store', signal: AbortSignal.timeout(20000) });
+    let root = dataRoot;
+    if (!localPreview && Date.now() >= nextApiCheck) {
+      nextApiCheck = Date.now() + refreshMs;
+      try {
+        // Anonymous GitHub API has a 60/hour/IP limit. One lookup per 65 s;
+        // then immutable commit URLs avoid the delayed branch cache entirely.
+        const head = await fetch('https://api.github.com/repos/' + repository + '/commits/dados', { cache: 'no-store', signal: AbortSignal.timeout(10000) });
+        if (head.status === 403 || head.status === 429) nextApiCheck = Math.max(Date.now() + 600000, Number(head.headers.get('x-ratelimit-reset') || 0) * 1000);
+        if (head.ok) {
+          const commit = await head.json();
+          if (/^[a-f0-9]{40}$/.test(commit.sha)) root = 'https://raw.githubusercontent.com/' + repository + '/' + commit.sha + '/';
+        }
+      } catch { /* Public branch remains available if the metadata API fails. */ }
+    }
+    const r = await fetch(root + 'latest.json?consulta=' + Math.floor(Date.now() / refreshMs), { cache: 'no-store', signal: AbortSignal.timeout(20000) });
     if (!r.ok) throw Error('Arquivo temporariamente indisponível.');
     const fresh = await r.json();
     if (!Number.isSafeInteger(fresh.historyVersion) || fresh.historyVersion < 0) throw Error('Resposta do painel inválida.');
     if (fresh.current && (!Array.isArray(fresh.current.candidates) || !Number.isSafeInteger(fresh.current.observedAt))) throw Error('Resultado do painel inválido.');
+    if (state.checkedAt && fresh.checkedAt < state.checkedAt) return;
     if (historyVersion !== fresh.historyVersion) {
-      const hr = await fetch(dataRoot + 'history.json?registro=' + fresh.historyVersion, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
+      const hr = await fetch(root + 'history.json?registro=' + fresh.historyVersion, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
       if (!hr.ok) throw Error('Histórico temporariamente indisponível.');
       const archive = await hr.json();
       if (!Array.isArray(archive.history) || archive.version < fresh.historyVersion) throw Error('Histórico aguardando publicação.');
@@ -131,7 +150,7 @@ async function poll() {
   } catch (error) {
     state = { ...state, error: error.message, nextCheck: Date.now() + 5000 };
     if (!testing) render();
-  } finally { busy = false; pollTimer = setTimeout(poll, state.error ? 5000 : 2000); }
+  } finally { busy = false; pollTimer = setTimeout(poll, state.error ? 10000 : refreshMs); }
 }
 
 $('testar').addEventListener('click', () => {
