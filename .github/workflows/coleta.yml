@@ -1,0 +1,37 @@
+name: Arquivar apuração do TSE
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: arquivo-tse
+  cancel-in-progress: false
+jobs:
+  coletar:
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        etapa: [1, 2, 3, 4]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: dados
+          path: archive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preparar assinatura dos registros
+        working-directory: archive
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Coletar e publicar o conjunto de dados
+        env:
+          ARCHIVE_DIR: archive
+          PUBLISH_GIT: '1'
+          DURATION_MS: '18000000'
+        run: node scripts/publicar.mjs
