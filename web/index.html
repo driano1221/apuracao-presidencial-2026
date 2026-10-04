@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presidente · painel de apuração</title>
+  <meta name="description" content="Apuração presidencial do TSE, histórico dos votos e simulação de teste.">
+  <link rel="preload" href="fonts/IBMPlexSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23090e48'/%3E%3Cpath d='M5 26V20H12V15H19V8H27' fill='none' stroke='%239df0b2' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="painel.css">
+  <script src="painel.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#resultado">Ir para o resultado</a>
+  <main>
+    <header>
+      <div><p class="meta">BRASIL · 1º TURNO · 2026</p><h1>PRESIDENTE</h1></div>
+      <button id="testar" type="button">TESTE</button>
+    </header>
+    <div class="status"><strong id="modo-status">CONECTANDO AO TSE</strong><span><output id="percentual">—</output> DAS SEÇÕES · <output id="hora">—</output></span></div>
+    <section id="resultado" aria-label="Resultado da apuração">
+      <table>
+        <thead><tr><th scope="col">CANDIDATURA</th><th scope="col">VOTOS</th><th scope="col">%</th></tr></thead>
+        <tbody id="candidaturas"></tbody>
+      </table>
+    </section>
+    <section class="series" aria-labelledby="titulo-grafico">
+      <div class="chart-heading"><h2 id="titulo-grafico">EVOLUÇÃO DOS VOTOS</h2><span id="total">0 VOTOS</span></div>
+      <div id="grafico" class="plot"></div>
+      <div class="timeline" id="linha-tempo" hidden>
+        <button id="pausar" type="button">PAUSAR</button>
+        <input id="instante" type="range" min="0" max="48" value="0" step="1" aria-label="Horário da simulação">
+        <output id="instante-hora" for="instante">17:00</output>
+      </div>
+    </section>
+    <footer><span id="play-status">CONSULTA A CADA 2 S</span><span>04/10/2026 · BRASÍLIA</span></footer>
+  </main>
+  <p class="source" id="fonte-status" role="status">Consultando a fonte oficial. O botão TESTE abre uma simulação com votos fictícios.</p>
+</body>
+</html>

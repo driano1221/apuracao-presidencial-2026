@@ -1,0 +1,11 @@
+{
+  "name": "apuracao-presidencial-2026",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test scripts/coleta.test.mjs",
+    "collect": "node scripts/publicar.mjs"
+  }
+}
