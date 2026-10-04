@@ -8,8 +8,10 @@ Acesso público, sem conta do ChatGPT e sem login do visitante.
 Código e dados públicos: https://github.com/driano1221/apuracao-presidencial-2026
 
 COMO FUNCIONA
-O GitHub Pages serve a interface estática, incluindo fontes locais e o botão
-TESTE. A rotina de publicação do conjunto de dados roda no GitHub Actions,
+O GitHub Pages serve a interface estática, incluindo fontes locais.
+O botão TESTE fica oculto e desabilitado no site público; a simulação continua
+disponível apenas na prévia local (localhost ou 127.0.0.1).
+A rotina de publicação do conjunto de dados roda no GitHub Actions,
 consulta o JSON nacional do TSE a cada aproximadamente 2 segundos e arquiva
 somente novas gerações. O contexto da eleição é identificado no EA11; os
 votos vêm do EA20. Nenhuma candidatura fictícia entra nos arquivos oficiais.
@@ -26,7 +28,7 @@ o último resultado e informa quando o arquivo está atrasado.
 A coleta central continua a cada aproximadamente 2 segundos, mas a
 atualização visível desta versão gratuita ocorre em torno de um minuto,
 somado à publicação e ao cache do próprio TSE. Nenhum serviço usa os runners
-como servidor HTTP. O modo TESTE atualiza a cada 0,5 segundo.
+como servidor HTTP. A simulação local atualiza a cada 0,5 segundo.
 
 A coleta independe do computador e de páginas abertas. Usa quatro etapas
 de até 5 horas, sequenciais, recuperando os registros da branch dados em cada

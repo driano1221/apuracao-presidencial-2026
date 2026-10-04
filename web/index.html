@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Presidente · painel de apuração</title>
-  <meta name="description" content="Apuração presidencial do TSE, histórico dos votos e simulação de teste.">
+  <meta name="description" content="Apuração presidencial do TSE e histórico dos votos.">
   <link rel="preload" href="fonts/IBMPlexSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23090e48'/%3E%3Cpath d='M5 26V20H12V15H19V8H27' fill='none' stroke='%239df0b2' stroke-width='3'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="painel.css">
@@ -15,7 +15,7 @@
   <main>
     <header>
       <div><p class="meta">BRASIL · 1º TURNO · 2026</p><h1>PRESIDENTE</h1></div>
-      <button id="testar" type="button">TESTE</button>
+      <button id="testar" type="button" hidden disabled>TESTE</button>
     </header>
     <div class="status"><strong id="modo-status">CONECTANDO AO TSE</strong><span><output id="percentual">—</output> DAS SEÇÕES · <output id="hora">—</output></span></div>
     <section id="resultado" aria-label="Resultado da apuração">
@@ -35,6 +35,6 @@
     </section>
     <footer><span id="play-status">ATUALIZAÇÃO · CERCA DE 1 MIN</span><span>04/10/2026 · BRASÍLIA</span></footer>
   </main>
-  <p class="source" id="fonte-status" role="status">Consultando a fonte oficial. O botão TESTE abre uma simulação com votos fictícios.</p>
+  <p class="source" id="fonte-status" role="status">Consultando a fonte oficial. Painel independente, sem vínculo com o TSE.</p>
 </body>
 </html>
